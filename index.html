@@ -2,1372 +2,879 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
-
-  <meta
-    name="theme-color"
-    content="#06111e"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>AI Market Analyzer</title>
 
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="AI powered Real Market and OTC Market analysis dashboard">
+
+  <!-- Main CSS -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
 </head>
 
 <body>
 
-  <!-- =====================================================
-       APP
-  ====================================================== -->
+  <!-- =========================================
+       APP LOADER
+  ========================================== -->
+  <div id="appLoader" class="app-loader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">
+      <span>AI</span> MARKET ANALYZER
+    </div>
+    <div class="loader-subtitle">Initializing Analysis Engine...</div>
+  </div>
 
-  <div id="app">
+
+  <!-- =========================================
+       BACKGROUND EFFECTS
+  ========================================== -->
+  <div class="background-effects">
+    <div class="bg-grid"></div>
+    <div class="glow glow-one"></div>
+    <div class="glow glow-two"></div>
+    <div class="glow glow-three"></div>
+  </div>
 
 
-    <!-- ===================================================
-         HEADER
-    ==================================================== -->
+  <!-- =========================================
+       HEADER
+  ========================================== -->
+  <header class="top-header">
 
-    <header class="top-header">
-
-      <div class="brand">
-
-        <div class="brand-logo">
-          AI
-        </div>
-
-        <div class="brand-name">
-          Market Analyzer
-        </div>
-
+    <div class="brand-area">
+      <div class="brand-icon">
+        <span>AI</span>
       </div>
 
+      <div class="brand-text">
+        <h1>Market Analyzer</h1>
+        <p>AI Trading Intelligence</p>
+      </div>
+    </div>
 
+
+    <!-- Hamburger Menu -->
+    <button
+      id="menuButton"
+      class="menu-button"
+      type="button"
+      aria-label="Open menu"
+      aria-expanded="false"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+  </header>
+
+
+  <!-- =========================================
+       SIDE MENU
+  ========================================== -->
+  <aside id="sideMenu" class="side-menu">
+
+    <div class="menu-header">
+      <div>
+        <small>TRADING TOOLS</small>
+        <h2>Menu</h2>
+      </div>
+
+      <button id="closeMenu" class="close-menu" type="button">
+        ×
+      </button>
+    </div>
+
+
+    <div class="menu-items">
+
+      <!-- Dashboard -->
       <button
-        class="menu-button"
-        id="menuButton"
+        class="menu-item active"
+        data-page="dashboardPage"
         type="button"
-        aria-label="Open menu"
       >
+        <span class="menu-item-icon">⌂</span>
 
-        <span></span>
-        <span></span>
-        <span></span>
+        <span class="menu-item-content">
+          <strong>Dashboard</strong>
+          <small>Overview & tools</small>
+        </span>
 
+        <span class="menu-arrow">›</span>
       </button>
 
-    </header>
 
-
-
-    <!-- ===================================================
-         MENU OVERLAY
-    ==================================================== -->
-
-    <div
-      class="menu-overlay"
-      id="menuOverlay"
-    ></div>
-
-
-
-    <!-- ===================================================
-         SIDE MENU
-    ==================================================== -->
-
-    <aside
-      class="side-menu"
-      id="sideMenu"
-    >
-
-      <div class="menu-header">
-
-        <div>
-
-          <small>
-            AI ENGINE
-          </small>
-
-          <h2>
-            Analyzer Menu
-          </h2>
-
-        </div>
-
-
-        <button
-          id="closeMenu"
-          class="close-menu"
-          type="button"
-        >
-          ×
-        </button>
-
-      </div>
-
-
-      <div class="menu-list">
-
-        <button
-          class="menu-item"
-          data-page="dashboardPage"
-          type="button"
-        >
-
-          <span class="menu-icon">
-            ⌂
-          </span>
-
-          <span>
-            Dashboard
-          </span>
-
-        </button>
-
-
-        <button
-          class="menu-item"
-          data-page="realMarketPage"
-          type="button"
-        >
-
-          <span class="menu-icon">
-            📈
-          </span>
-
-          <span>
-            Real Market Analysis
-          </span>
-
-        </button>
-
-
-        <button
-          class="menu-item"
-          data-page="otcMarketPage"
-          type="button"
-        >
-
-          <span class="menu-icon">
-            ⚡
-          </span>
-
-          <span>
-            OTC Market Analysis
-          </span>
-
-        </button>
-
-
-        <button
-          class="menu-item"
-          data-page="futureSignalPage"
-          type="button"
-        >
-
-          <span class="menu-icon">
-            🎯
-          </span>
-
-          <span>
-            Future Signals
-          </span>
-
-        </button>
-
-      </div>
-
-
-      <div class="menu-footer">
-
-        <span class="status-dot"></span>
-
-        AI Engine Ready
-
-        <small>
-          v1.0
-        </small>
-
-      </div>
-
-    </aside>
-
-
-
-    <!-- ===================================================
-         MAIN CONTENT
-    ==================================================== -->
-
-    <main id="mainContent">
-
-
-
-      <!-- =================================================
-           DASHBOARD
-      ================================================== -->
-
-      <section
-        class="page active-page"
-        id="dashboardPage"
-      >
-
-        <div class="dashboard-hero">
-
-          <div class="hero-badge">
-            AI POWERED MARKET ANALYSIS
-          </div>
-
-          <h1>
-            Smart Market
-            <span>Analyzer</span>
-          </h1>
-
-          <p>
-            Analyze your trading market using
-            real market data and technical
-            indicators.
-          </p>
-
-        </div>
-
-
-        <div class="dashboard-cards">
-
-
-          <button
-            class="dashboard-card"
-            data-page="realMarketPage"
-            type="button"
-          >
-
-            <div class="card-icon real">
-              📈
-            </div>
-
-            <div class="card-content">
-
-              <h3>
-                Real Market
-              </h3>
-
-              <p>
-                Upload your chart and analyze
-                the selected real market.
-              </p>
-
-            </div>
-
-            <span class="card-arrow">
-              →
-            </span>
-
-          </button>
-
-
-
-          <button
-            class="dashboard-card"
-            data-page="otcMarketPage"
-            type="button"
-          >
-
-            <div class="card-icon otc">
-              ⚡
-            </div>
-
-            <div class="card-content">
-
-              <h3>
-                OTC Market
-              </h3>
-
-              <p>
-                Upload an OTC chart for
-                technical analysis.
-              </p>
-
-            </div>
-
-            <span class="card-arrow">
-              →
-            </span>
-
-          </button>
-
-
-
-          <button
-            class="dashboard-card"
-            data-page="futureSignalPage"
-            type="button"
-          >
-
-            <div class="card-icon future">
-              🎯
-            </div>
-
-            <div class="card-content">
-
-              <h3>
-                Future Signals
-              </h3>
-
-              <p>
-                Select a market and analyze
-                current market conditions.
-              </p>
-
-            </div>
-
-            <span class="card-arrow">
-              →
-            </span>
-
-          </button>
-
-        </div>
-
-
-        <div class="dashboard-warning">
-
-          <span>
-            ⚠
-          </span>
-
-          <div>
-
-            <strong>
-              Important
-            </strong>
-
-            <p>
-              No market data means no signal.
-              The analyzer will never create
-              a random/demo signal.
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-
-      <!-- =================================================
-           REAL MARKET PAGE
-      ================================================== -->
-
-      <section
-        class="page"
-        id="realMarketPage"
-      >
-
-        <div class="page-title">
-
-          <button
-            class="back-button"
-            data-page="dashboardPage"
-            type="button"
-          >
-            ←
-          </button>
-
-          <div>
-
-            <small>
-              REAL MARKET
-            </small>
-
-            <h1>
-              Market Analysis
-            </h1>
-
-          </div>
-
-        </div>
-
-
-
-        <!-- MARKET SELECT -->
-
-        <div class="market-selector-box">
-
-          <label for="realMarketSelect">
-            Select Market
-          </label>
-
-          <select
-            id="realMarketSelect"
-          >
-
-            <option value="">
-              Select a market
-            </option>
-
-            <option value="EUR/USD">
-              EUR/USD
-            </option>
-
-            <option value="GBP/USD">
-              GBP/USD
-            </option>
-
-            <option value="USD/JPY">
-              USD/JPY
-            </option>
-
-            <option value="USD/CHF">
-              USD/CHF
-            </option>
-
-            <option value="AUD/USD">
-              AUD/USD
-            </option>
-
-            <option value="USD/CAD">
-              USD/CAD
-            </option>
-
-            <option value="NZD/USD">
-              NZD/USD
-            </option>
-
-            <option value="EUR/GBP">
-              EUR/GBP
-            </option>
-
-            <option value="EUR/JPY">
-              EUR/JPY
-            </option>
-
-            <option value="GBP/JPY">
-              GBP/JPY
-            </option>
-
-            <option value="AUD/JPY">
-              AUD/JPY
-            </option>
-
-            <option value="EUR/AUD">
-              EUR/AUD
-            </option>
-
-            <option value="EUR/CAD">
-              EUR/CAD
-            </option>
-
-            <option value="GBP/CAD">
-              GBP/CAD
-            </option>
-
-            <option value="BTC/USD">
-              BTC/USD
-            </option>
-
-            <option value="ETH/USD">
-              ETH/USD
-            </option>
-
-            <option value="XAU/USD">
-              XAU/USD
-            </option>
-
-          </select>
-
-        </div>
-
-
-
-        <!-- UPLOAD -->
-
-        <div
-          class="upload-box"
-          id="realUploadBox"
-        >
-
-          <input
-            type="file"
-            id="realChartInput"
-            accept="image/png,image/jpeg,image/webp"
-            hidden
-          >
-
-          <label
-            for="realChartInput"
-            class="upload-label"
-          >
-
-            <div class="upload-icon">
-              ↑
-            </div>
-
-            <h2>
-              Upload Chart Screenshot
-            </h2>
-
-            <p>
-              Select a clear screenshot of your
-              trading chart for analysis.
-            </p>
-
-            <span class="choose-button">
-              Choose Image
-              <b>+</b>
-            </span>
-
-            <small id="realFileName">
-              No image selected
-            </small>
-
-          </label>
-
-        </div>
-
-
-
-        <!-- PREVIEW -->
-
-        <div
-          class="preview-box hidden"
-          id="realPreviewBox"
-        >
-
-          <div class="section-heading">
-
-            <span>
-              CHART PREVIEW
-            </span>
-
-            <button
-              type="button"
-              id="realRemoveImage"
-            >
-              Remove
-            </button>
-
-          </div>
-
-          <div class="preview-image-wrapper">
-
-            <img
-              id="realPreviewImage"
-              alt="Chart Preview"
-            >
-
-          </div>
-
-        </div>
-
-
-
-        <!-- ANALYSIS LOADING -->
-
-        <div
-          class="analysis-loading hidden"
-          id="realAnalysisProgress"
-        >
-
-          <div class="analysis-loading-header">
-
-            <span>
-              AI ANALYZING MARKET
-            </span>
-
-            <span>
-              <b class="loading-time">
-                LIVE
-              </b>
-            </span>
-
-          </div>
-
-
-          <div
-            class="analysis-steps"
-            id="realAnalysisSteps"
-          >
-
-            <div class="analysis-step active">
-              <span>01</span>
-              Reading market data...
-            </div>
-
-            <div class="analysis-step">
-              <span>02</span>
-              Checking trend...
-            </div>
-
-            <div class="analysis-step">
-              <span>03</span>
-              Checking indicators...
-            </div>
-
-            <div class="analysis-step">
-              <span>04</span>
-              Checking candle pattern...
-            </div>
-
-            <div class="analysis-step">
-              <span>05</span>
-              Calculating signal...
-            </div>
-
-          </div>
-
-        </div>
-
-
-
-        <!-- RESULT -->
-
-        <div
-          class="result-box hidden"
-          id="realResultBox"
-        >
-
-          <div class="result-heading">
-
-            <span>
-              AI ANALYSIS RESULT
-            </span>
-
-            <span id="realResultTime">
-              -- 
-            </span>
-
-          </div>
-
-
-          <div
-            class="signal-card"
-            id="realSignal"
-          >
-
-            <div class="signal-arrow">
-              ↑
-            </div>
-
-            <div class="signal-label">
-              SIGNAL
-            </div>
-
-            <div
-              class="signal-text"
-              id="realSignalText"
-            >
-              NO SIGNAL
-            </div>
-
-          </div>
-
-
-
-          <!-- CONFIDENCE -->
-
-          <div class="indicator-card">
-
-            <div class="indicator-top">
-
-              <span>
-                Confidence
-              </span>
-
-              <strong
-                id="realConfidence"
-              >
-                0%
-              </strong>
-
-            </div>
-
-            <div class="progress-track">
-
-              <div
-                class="progress-fill"
-                id="realConfidenceFill"
-              ></div>
-
-            </div>
-
-          </div>
-
-
-
-          <!-- TREND -->
-
-          <div class="indicator-card">
-
-            <span class="indicator-name">
-              TREND
-            </span>
-
-            <strong
-              id="realTrend"
-            >
-              --
-            </strong>
-
-          </div>
-
-
-
-          <!-- PATTERN -->
-
-          <div class="indicator-card">
-
-            <span class="indicator-name">
-              CANDLE PATTERN
-            </span>
-
-            <strong
-              id="realPattern"
-            >
-              --
-            </strong>
-
-          </div>
-
-
-
-          <!-- MOMENTUM -->
-
-          <div class="indicator-card">
-
-            <span class="indicator-name">
-              MOMENTUM
-            </span>
-
-            <strong
-              id="realMomentum"
-            >
-              --
-            </strong>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-
-      <!-- =================================================
-           OTC MARKET PAGE
-      ================================================== -->
-
-      <section
-        class="page"
-        id="otcMarketPage"
-      >
-
-        <div class="page-title">
-
-          <button
-            class="back-button"
-            data-page="dashboardPage"
-            type="button"
-          >
-            ←
-          </button>
-
-          <div>
-
-            <small>
-              OTC MARKET
-            </small>
-
-            <h1>
-              OTC Analysis
-            </h1>
-
-          </div>
-
-        </div>
-
-
-
-        <div class="market-selector-box">
-
-          <label for="otcMarketSelect">
-            Select OTC Market
-          </label>
-
-          <select
-            id="otcMarketSelect"
-          >
-
-            <option value="">
-              Select OTC market
-            </option>
-
-            <option value="EUR/USD">
-              EUR/USD OTC
-            </option>
-
-            <option value="GBP/USD">
-              GBP/USD OTC
-            </option>
-
-            <option value="USD/JPY">
-              USD/JPY OTC
-            </option>
-
-            <option value="AUD/USD">
-              AUD/USD OTC
-            </option>
-
-            <option value="EUR/JPY">
-              EUR/JPY OTC
-            </option>
-
-            <option value="GBP/JPY">
-              GBP/JPY OTC
-            </option>
-
-            <option value="USD/CAD">
-              USD/CAD OTC
-            </option>
-
-            <option value="NZD/USD">
-              NZD/USD OTC
-            </option>
-
-          </select>
-
-        </div>
-
-
-
-        <div
-          class="upload-box"
-          id="otcUploadBox"
-        >
-
-          <input
-            type="file"
-            id="otcChartInput"
-            accept="image/png,image/jpeg,image/webp"
-            hidden
-          >
-
-          <label
-            for="otcChartInput"
-            class="upload-label"
-          >
-
-            <div class="upload-icon">
-              ↑
-            </div>
-
-            <h2>
-              Upload OTC Chart
-            </h2>
-
-            <p>
-              Upload a clear OTC chart screenshot.
-            </p>
-
-            <span class="choose-button">
-              Choose Image
-              <b>+</b>
-            </span>
-
-            <small id="otcFileName">
-              No image selected
-            </small>
-
-          </label>
-
-        </div>
-
-
-
-        <div
-          class="preview-box hidden"
-          id="otcPreviewBox"
-        >
-
-          <div class="section-heading">
-
-            <span>
-              CHART PREVIEW
-            </span>
-
-            <button
-              type="button"
-              id="otcRemoveImage"
-            >
-              Remove
-            </button>
-
-          </div>
-
-          <div class="preview-image-wrapper">
-
-            <img
-              id="otcPreviewImage"
-              alt="OTC Chart Preview"
-            >
-
-          </div>
-
-        </div>
-
-
-
-        <div
-          class="analysis-loading hidden"
-          id="otcAnalysisProgress"
-        >
-
-          <div class="analysis-loading-header">
-
-            <span>
-              AI ANALYZING OTC
-            </span>
-
-            <span>
-              <b>
-                LIVE
-              </b>
-            </span>
-
-          </div>
-
-
-          <div
-            class="analysis-steps"
-            id="otcAnalysisSteps"
-          >
-
-            <div class="analysis-step active">
-              <span>01</span>
-              Reading market data...
-            </div>
-
-            <div class="analysis-step">
-              <span>02</span>
-              Checking trend...
-            </div>
-
-            <div class="analysis-step">
-              <span>03</span>
-              Checking indicators...
-            </div>
-
-            <div class="analysis-step">
-              <span>04</span>
-              Checking candle pattern...
-            </div>
-
-            <div class="analysis-step">
-              <span>05</span>
-              Calculating signal...
-            </div>
-
-          </div>
-
-        </div>
-
-
-
-        <div
-          class="result-box hidden"
-          id="otcResultBox"
-        >
-
-          <div class="result-heading">
-
-            <span>
-              AI ANALYSIS RESULT
-            </span>
-
-            <span id="otcResultTime">
-              --
-            </span>
-
-          </div>
-
-
-          <div
-            class="signal-card"
-            id="otcSignal"
-          >
-
-            <div class="signal-arrow">
-              ↑
-            </div>
-
-            <div class="signal-label">
-              SIGNAL
-            </div>
-
-            <div
-              class="signal-text"
-              id="otcSignalText"
-            >
-              NO SIGNAL
-            </div>
-
-          </div>
-
-
-          <div class="indicator-card">
-
-            <div class="indicator-top">
-
-              <span>
-                Confidence
-              </span>
-
-              <strong id="otcConfidence">
-                0%
-              </strong>
-
-            </div>
-
-            <div class="progress-track">
-
-              <div
-                class="progress-fill"
-                id="otcConfidenceFill"
-              ></div>
-
-            </div>
-
-          </div>
-
-
-          <div class="indicator-card">
-
-            <span class="indicator-name">
-              TREND
-            </span>
-
-            <strong id="otcTrend">
-              --
-            </strong>
-
-          </div>
-
-
-          <div class="indicator-card">
-
-            <span class="indicator-name">
-              CANDLE PATTERN
-            </span>
-
-            <strong id="otcPattern">
-              --
-            </strong>
-
-          </div>
-
-
-          <div class="indicator-card">
-
-            <span class="indicator-name">
-              MOMENTUM
-            </span>
-
-            <strong id="otcMomentum">
-              --
-            </strong>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-
-      <!-- =================================================
-           FUTURE SIGNAL PAGE
-      ================================================== -->
-
-      <section
-        class="page"
-        id="futureSignalPage"
-      >
-
-        <div class="page-title">
-
-          <button
-            class="back-button"
-            data-page="dashboardPage"
-            type="button"
-          >
-            ←
-          </button>
-
-          <div>
-
-            <small>
-              MARKET SIGNAL
-            </small>
-
-            <h1>
-              Future Signals
-            </h1>
-
-          </div>
-
-        </div>
-
-
-
-        <div class="future-info">
-
-          <div class="future-icon">
-            🎯
-          </div>
-
-          <h2>
-            Market Signal Engine
-          </h2>
-
-          <p>
-            Select a market. The engine will
-            analyze current market conditions
-            using available market data.
-          </p>
-
-        </div>
-
-
-
-        <div class="market-selector-box">
-
-          <label for="marketSelect">
-            Select Market
-          </label>
-
-          <select id="marketSelect">
-
-            <option value="">
-              Select a market
-            </option>
-
-            <option value="EUR/USD">
-              EUR/USD
-            </option>
-
-            <option value="GBP/USD">
-              GBP/USD
-            </option>
-
-            <option value="USD/JPY">
-              USD/JPY
-            </option>
-
-            <option value="USD/CHF">
-              USD/CHF
-            </option>
-
-            <option value="AUD/USD">
-              AUD/USD
-            </option>
-
-            <option value="USD/CAD">
-              USD/CAD
-            </option>
-
-            <option value="NZD/USD">
-              NZD/USD
-            </option>
-
-            <option value="EUR/GBP">
-              EUR/GBP
-            </option>
-
-            <option value="EUR/JPY">
-              EUR/JPY
-            </option>
-
-            <option value="GBP/JPY">
-              GBP/JPY
-            </option>
-
-            <option value="AUD/JPY">
-              AUD/JPY
-            </option>
-
-            <option value="EUR/AUD">
-              EUR/AUD
-            </option>
-
-            <option value="EUR/CAD">
-              EUR/CAD
-            </option>
-
-            <option value="GBP/CAD">
-              GBP/CAD
-            </option>
-
-            <option value="BTC/USD">
-              BTC/USD
-            </option>
-
-            <option value="ETH/USD">
-              ETH/USD
-            </option>
-
-            <option value="XAU/USD">
-              XAU/USD
-            </option>
-
-          </select>
-
-        </div>
-
-
-
-        <button
-          class="generate-button"
-          id="generateSignalsButton"
-          type="button"
-        >
-
-          <span>
-            ⚡
-          </span>
-
-          Analyze Market
-
-        </button>
-
-
-
-        <div
-          class="signals-container hidden"
-          id="signalsContainer"
-        >
-
-          <div class="signals-heading">
-
-            <div>
-
-              <small>
-                ANALYSIS OUTPUT
-              </small>
-
-              <h2>
-                Market Signals
-              </h2>
-
-            </div>
-
-            <span>
-              LIVE DATA
-            </span>
-
-          </div>
-
-
-          <div
-            class="signal-list"
-            id="signalList"
-          ></div>
-
-
-          <div class="signal-note">
-
-            <span>
-              ⓘ
-            </span>
-
-            Signals are generated from
-            market data and technical analysis.
-            If conditions are unclear,
-            <strong>NO SIGNAL</strong> is returned.
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-
-    </main>
-
-
-
-    <!-- ===================================================
-         FOOTER STATUS
-    ==================================================== -->
-
-    <footer class="app-footer">
-
-      <div class="engine-status">
-
-        <span class="status-dot"></span>
-
-        AI ENGINE READY
-
-      </div>
-
-      <span>
-        v1.0
-      </span>
-
-    </footer>
-
-
-
-    <!-- ===================================================
-         TOAST
-    ==================================================== -->
-
-    <div
-      class="toast"
-      id="toast"
-    >
-
-      <div class="toast-icon">
-        ✓
-      </div>
-
-      <div class="toast-content">
-
-        <strong id="toastTitle">
-          Done
-        </strong>
-
-        <p id="toastMessage">
-          Analysis complete.
-        </p>
-
-      </div>
-
+      <!-- Real Market -->
       <button
-        id="toastClose"
+        class="menu-item"
+        data-page="realAnalysisPage"
         type="button"
       >
-        ×
+        <span class="menu-item-icon real-icon">◉</span>
+
+        <span class="menu-item-content">
+          <strong>Real Market Analysis</strong>
+          <small>Analyze live market charts</small>
+        </span>
+
+        <span class="menu-arrow">›</span>
+      </button>
+
+
+      <!-- OTC Market -->
+      <button
+        class="menu-item"
+        data-page="otcAnalysisPage"
+        type="button"
+      >
+        <span class="menu-item-icon otc-icon">◈</span>
+
+        <span class="menu-item-content">
+          <strong>OTC Market Analysis</strong>
+          <small>Analyze OTC chart screenshots</small>
+        </span>
+
+        <span class="menu-arrow">›</span>
+      </button>
+
+
+      <!-- Future Signals -->
+      <button
+        class="menu-item"
+        data-page="futureSignalsPage"
+        type="button"
+      >
+        <span class="menu-item-icon future-icon">⚡</span>
+
+        <span class="menu-item-content">
+          <strong>Future Signals</strong>
+          <small>Generate market signals</small>
+        </span>
+
+        <span class="menu-arrow">›</span>
       </button>
 
     </div>
 
 
+    <div class="menu-footer">
+      <div class="status-dot"></div>
+
+      <div>
+        <strong>AI Engine</strong>
+        <small id="engineStatus">Ready</small>
+      </div>
+    </div>
+
+  </aside>
+
+
+  <!-- Overlay -->
+  <div id="menuOverlay" class="menu-overlay"></div>
+
+
+  <!-- =========================================
+       MAIN APP
+  ========================================== -->
+  <main id="app" class="app-container">
+
+
+    <!-- =======================================
+         DASHBOARD PAGE
+    ======================================== -->
+    <section id="dashboardPage" class="page active-page">
+
+      <div class="hero-section">
+
+        <div class="hero-badge">
+          <span class="live-dot"></span>
+          AI ANALYSIS ENGINE ONLINE
+        </div>
+
+        <h2 class="hero-title">
+          Trade Smarter
+          <span>With AI</span>
+        </h2>
+
+        <p class="hero-description">
+          Upload your trading chart and let the analysis engine
+          inspect patterns, candles, trend, momentum and market structure.
+        </p>
+
+        <button
+          class="primary-button"
+          data-page-target="realAnalysisPage"
+          type="button"
+        >
+          <span>Start Analysis</span>
+          <b>→</b>
+        </button>
+
+      </div>
+
+
+      <!-- Dashboard Cards -->
+      <div class="dashboard-grid">
+
+        <div class="dashboard-card card-real">
+          <div class="card-icon">◉</div>
+          <div class="card-info">
+            <h3>Real Market</h3>
+            <p>Chart screenshot analysis</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </div>
+
+
+        <div class="dashboard-card card-otc">
+          <div class="card-icon">◈</div>
+          <div class="card-info">
+            <h3>OTC Market</h3>
+            <p>OTC chart analysis</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </div>
+
+
+        <div class="dashboard-card card-future">
+          <div class="card-icon">⚡</div>
+          <div class="card-info">
+            <h3>Future Signals</h3>
+            <p>10 signal generation</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </div>
+
+      </div>
+
+
+      <!-- Features -->
+      <div class="features-section">
+
+        <div class="section-heading">
+          <span>FEATURES</span>
+          <h3>Analysis Intelligence</h3>
+        </div>
+
+
+        <div class="feature-list">
+
+          <div class="feature-item">
+            <span class="feature-number">01</span>
+
+            <div>
+              <strong>Pattern Detection</strong>
+              <p>Identify important chart formations.</p>
+            </div>
+
+            <span class="feature-check">✓</span>
+          </div>
+
+
+          <div class="feature-item">
+            <span class="feature-number">02</span>
+
+            <div>
+              <strong>Trend Analysis</strong>
+              <p>Analyze market direction and momentum.</p>
+            </div>
+
+            <span class="feature-check">✓</span>
+          </div>
+
+
+          <div class="feature-item">
+            <span class="feature-number">03</span>
+
+            <div>
+              <strong>Candle Analysis</strong>
+              <p>Inspect recent candle behaviour.</p>
+            </div>
+
+            <span class="feature-check">✓</span>
+          </div>
+
+
+          <div class="feature-item">
+            <span class="feature-number">04</span>
+
+            <div>
+              <strong>Market Structure</strong>
+              <p>Check support, resistance and structure.</p>
+            </div>
+
+            <span class="feature-check">✓</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =======================================
+         REAL MARKET ANALYSIS PAGE
+    ======================================== -->
+    <section id="realAnalysisPage" class="page">
+
+      <div class="page-header">
+
+        <button class="back-button" data-page-target="dashboardPage" type="button">
+          ←
+        </button>
+
+        <div>
+          <span class="page-label">REAL MARKET</span>
+          <h2>Market Analysis</h2>
+        </div>
+
+        <div class="page-status">
+          <span></span>
+          READY
+        </div>
+
+      </div>
+
+
+      <div class="analysis-container">
+
+        <!-- Upload Box -->
+        <div class="upload-card">
+
+          <div class="upload-icon">
+            <span>↥</span>
+          </div>
+
+          <h3>Upload Chart Screenshot</h3>
+
+          <p>
+            Select a clear screenshot of your trading chart
+            for AI analysis.
+          </p>
+
+
+          <label class="upload-button" for="realChartInput">
+            <span>Choose Image</span>
+            <b>+</b>
+          </label>
+
+          <input
+            id="realChartInput"
+            class="file-input"
+            type="file"
+            accept="image/*"
+          >
+
+          <div id="realFileName" class="file-name">
+            No image selected
+          </div>
+
+        </div>
+
+
+        <!-- Image Preview -->
+        <div id="realPreviewBox" class="preview-box hidden">
+
+          <div class="preview-header">
+            <span>CHART PREVIEW</span>
+
+            <button id="removeRealImage" type="button">
+              Remove
+            </button>
+          </div>
+
+          <img id="realPreviewImage" src="" alt="Real market chart preview">
+
+        </div>
+
+
+        <!-- Analysis Progress -->
+        <div id="realAnalysisProgress" class="analysis-progress hidden">
+
+          <div class="analysis-progress-header">
+            <div>
+              <span class="small-label">AI ENGINE</span>
+              <h3>Analyzing Chart...</h3>
+            </div>
+
+            <span id="realAnalysisPercent">0%</span>
+          </div>
+
+          <div class="progress-bar">
+            <div id="realProgressFill" class="progress-fill"></div>
+          </div>
+
+
+          <div id="realAnalysisSteps" class="analysis-steps">
+
+            <div class="analysis-step">
+              <span>○</span>
+              <p>Reading chart structure...</p>
+            </div>
+
+            <div class="analysis-step">
+              <span>○</span>
+              <p>Checking candle pattern...</p>
+            </div>
+
+            <div class="analysis-step">
+              <span>○</span>
+              <p>Detecting trend...</p>
+            </div>
+
+            <div class="analysis-step">
+              <span>○</span>
+              <p>Checking support & resistance...</p>
+            </div>
+
+            <div class="analysis-step">
+              <span>○</span>
+              <p>Calculating market momentum...</p>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Result -->
+        <div id="realResultBox" class="result-box hidden">
+
+          <div class="result-top">
+            <span>AI ANALYSIS RESULT</span>
+            <span id="realResultTime">0.0s</span>
+          </div>
+
+          <div id="realSignal" class="signal-display">
+
+            <div class="signal-icon">↑</div>
+
+            <div class="signal-content">
+              <small>SIGNAL</small>
+              <strong id="realSignalText">UP</strong>
+            </div>
+
+          </div>
+
+
+          <div class="confidence-box">
+
+            <div>
+              <span>Confidence</span>
+              <strong id="realConfidence">--%</strong>
+            </div>
+
+            <div class="confidence-bar">
+              <div id="realConfidenceFill"></div>
+            </div>
+
+          </div>
+
+
+          <div class="result-details">
+
+            <div>
+              <span>Trend</span>
+              <strong id="realTrend">--</strong>
+            </div>
+
+            <div>
+              <span>Pattern</span>
+              <strong id="realPattern">--</strong>
+            </div>
+
+            <div>
+              <span>Momentum</span>
+              <strong id="realMomentum">--</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =======================================
+         OTC MARKET ANALYSIS PAGE
+    ======================================== -->
+    <section id="otcAnalysisPage" class="page">
+
+      <div class="page-header">
+
+        <button class="back-button" data-page-target="dashboardPage" type="button">
+          ←
+        </button>
+
+        <div>
+          <span class="page-label">OTC MARKET</span>
+          <h2>Market Analysis</h2>
+        </div>
+
+        <div class="page-status">
+          <span></span>
+          READY
+        </div>
+
+      </div>
+
+
+      <div class="analysis-container">
+
+        <!-- OTC Upload -->
+        <div class="upload-card otc-upload">
+
+          <div class="upload-icon">
+            <span>↥</span>
+          </div>
+
+          <h3>Upload OTC Chart</h3>
+
+          <p>
+            Upload your OTC trading chart screenshot
+            for analysis.
+          </p>
+
+
+          <label class="upload-button" for="otcChartInput">
+            <span>Choose Image</span>
+            <b>+</b>
+          </label>
+
+          <input
+            id="otcChartInput"
+            class="file-input"
+            type="file"
+            accept="image/*"
+          >
+
+          <div id="otcFileName" class="file-name">
+            No image selected
+          </div>
+
+        </div>
+
+
+        <!-- OTC Preview -->
+        <div id="otcPreviewBox" class="preview-box hidden">
+
+          <div class="preview-header">
+            <span>OTC CHART PREVIEW</span>
+
+            <button id="removeOtcImage" type="button">
+              Remove
+            </button>
+          </div>
+
+          <img id="otcPreviewImage" src="" alt="OTC chart preview">
+
+        </div>
+
+
+        <!-- OTC Analysis -->
+        <div id="otcAnalysisProgress" class="analysis-progress hidden">
+
+          <div class="analysis-progress-header">
+
+            <div>
+              <span class="small-label">OTC AI ENGINE</span>
+              <h3>Analyzing OTC Chart...</h3>
+            </div>
+
+            <span id="otcAnalysisPercent">0%</span>
+
+          </div>
+
+
+          <div class="progress-bar">
+            <div id="otcProgressFill" class="progress-fill"></div>
+          </div>
+
+
+          <div id="otcAnalysisSteps" class="analysis-steps">
+
+            <div class="analysis-step">
+              <span>○</span>
+              <p>Scanning chart...</p>
+            </div>
+
+            <div class="analysis-step">
+              <span>○</span>
+              <p>Detecting candle pattern...</p>
+            </div>
+
+            <div class="analysis-step">
+              <span>○</span>
+              <p>Checking OTC trend...</p>
+            </div>
+
+            <div class="analysis-step">
+              <span>○</span>
+              <p>Analyzing momentum...</p>
+            </div>
+
+            <div class="analysis-step">
+              <span>○</span>
+              <p>Building final signal...</p>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- OTC Result -->
+        <div id="otcResultBox" class="result-box hidden">
+
+          <div class="result-top">
+            <span>OTC AI RESULT</span>
+            <span id="otcResultTime">0.0s</span>
+          </div>
+
+
+          <div id="otcSignal" class="signal-display">
+
+            <div class="signal-icon">↑</div>
+
+            <div class="signal-content">
+              <small>OTC SIGNAL</small>
+              <strong id="otcSignalText">UP</strong>
+            </div>
+
+          </div>
+
+
+          <div class="confidence-box">
+
+            <div>
+              <span>Confidence</span>
+              <strong id="otcConfidence">--%</strong>
+            </div>
+
+            <div class="confidence-bar">
+              <div id="otcConfidenceFill"></div>
+            </div>
+
+          </div>
+
+
+          <div class="result-details">
+
+            <div>
+              <span>Trend</span>
+              <strong id="otcTrend">--</strong>
+            </div>
+
+            <div>
+              <span>Pattern</span>
+              <strong id="otcPattern">--</strong>
+            </div>
+
+            <div>
+              <span>Momentum</span>
+              <strong id="otcMomentum">--</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =======================================
+         FUTURE SIGNALS PAGE
+    ======================================== -->
+    <section id="futureSignalsPage" class="page">
+
+      <div class="page-header">
+
+        <button class="back-button" data-page-target="dashboardPage" type="button">
+          ←
+        </button>
+
+        <div>
+          <span class="page-label">FUTURE SIGNALS</span>
+          <h2>Signal Generator</h2>
+        </div>
+
+        <div class="page-status">
+          <span></span>
+          ONLINE
+        </div>
+
+      </div>
+
+
+      <div class="future-container">
+
+        <div class="future-intro">
+
+          <div class="future-icon-large">⚡</div>
+
+          <div>
+            <h3>Select Your Market</h3>
+            <p>
+              Choose a market and generate future signal ideas.
+            </p>
+          </div>
+
+        </div>
+
+
+        <!-- Market Select -->
+        <div class="market-selector">
+
+          <label for="marketSelect">
+            SELECT MARKET
+          </label>
+
+          <select id="marketSelect">
+
+            <option value="">
+              Choose a market...
+            </option>
+
+            <option value="EUR/USD">EUR/USD</option>
+            <option value="GBP/USD">GBP/USD</option>
+            <option value="USD/JPY">USD/JPY</option>
+            <option value="USD/CHF">USD/CHF</option>
+            <option value="AUD/USD">AUD/USD</option>
+            <option value="USD/CAD">USD/CAD</option>
+            <option value="NZD/USD">NZD/USD</option>
+            <option value="EUR/GBP">EUR/GBP</option>
+            <option value="EUR/JPY">EUR/JPY</option>
+            <option value="GBP/JPY">GBP/JPY</option>
+            <option value="AUD/JPY">AUD/JPY</option>
+            <option value="EUR/AUD">EUR/AUD</option>
+            <option value="EUR/CAD">EUR/CAD</option>
+            <option value="GBP/CAD">GBP/CAD</option>
+            <option value="AUD/CAD">AUD/CAD</option>
+            <option value="USD/SGD">USD/SGD</option>
+            <option value="USD/HKD">USD/HKD</option>
+            <option value="USD/TRY">USD/TRY</option>
+            <option value="USD/MXN">USD/MXN</option>
+            <option value="USD/ZAR">USD/ZAR</option>
+
+          </select>
+
+        </div>
+
+
+        <!-- Confirm -->
+        <button
+          id="generateSignalsButton"
+          class="generate-button"
+          type="button"
+        >
+          <span>Generate 10 Signals</span>
+          <b>⚡</b>
+        </button>
+
+
+        <!-- Signal Loading -->
+        <div id="signalLoading" class="signal-loading hidden">
+
+          <div class="signal-loader"></div>
+
+          <h3>Generating Signals...</h3>
+
+          <p>
+            AI is preparing market signal data
+          </p>
+
+        </div>
+
+
+        <!-- Signals -->
+        <div id="signalsContainer" class="signals-container hidden">
+
+          <div class="signals-header">
+
+            <div>
+              <span>GENERATED SIGNALS</span>
+              <h3 id="selectedMarketName">
+                Market Signals
+              </h3>
+            </div>
+
+            <span class="signal-count">
+              10 SIGNALS
+            </span>
+
+          </div>
+
+
+          <div id="signalList" class="signal-list">
+            <!-- JavaScript will insert signals here -->
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================================
+       TOAST NOTIFICATION
+  ========================================== -->
+  <div id="toast" class="toast">
+
+    <div class="toast-icon">✓</div>
+
+    <div class="toast-content">
+      <strong id="toastTitle">Success</strong>
+      <p id="toastMessage">Action completed.</p>
+    </div>
+
+    <button id="toastClose" type="button">×</button>
+
   </div>
 
 
-  <!-- =====================================================
-       CONFIG
-  ====================================================== -->
+  <!-- =========================================
+       FOOTER
+  ========================================== -->
+  <footer class="app-footer">
 
+    <div>
+      <span class="footer-pulse"></span>
+      AI ENGINE READY
+    </div>
+
+    <span>v1.0</span>
+
+  </footer>
+
+
+  <!-- =========================================
+       JAVASCRIPT CONFIG
+  ========================================== -->
   <script src="config.js"></script>
 
-  <!-- =====================================================
-       APP SCRIPT
-  ====================================================== -->
-
+  <!-- Main JavaScript -->
   <script src="script.js"></script>
 
 </body>
