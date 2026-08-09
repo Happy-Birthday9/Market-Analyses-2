@@ -1,60 +1,38 @@
-/* =========================================================
-   AI MARKET ANALYZER
-   script.js
-========================================================= */
-
 "use strict";
 
-
 /* =========================================================
-   GLOBAL SETTINGS
+   AI MARKET ANALYZER — FINAL
+   No random/demo signal
+   Screenshot -> Backend -> Twelve Data -> Analysis
 ========================================================= */
 
 const APP = {
-  analysisDuration: 6500,
+  analysisTimeout: 10000,
   maxFileSize: 10 * 1024 * 1024,
-  allowedImageTypes: [
+  allowedTypes: [
     "image/jpeg",
     "image/png",
     "image/webp",
     "image/jpg"
-  ]
+  ],
+
+  /* Backend endpoint */
+  apiEndpoint: "/api/analyze-chart"
 };
 
 
 /* =========================================================
-   DOM HELPERS
+   HELPERS
 ========================================================= */
 
 const $ = (selector) => document.querySelector(selector);
-const $$ = (selector) => document.querySelectorAll(selector);
+
+const $$ = (selector) =>
+  document.querySelectorAll(selector);
 
 
 /* =========================================================
-   DOM ELEMENTS
-========================================================= */
-
-const appLoader = $("#appLoader");
-
-const menuButton = $("#menuButton");
-const sideMenu = $("#sideMenu");
-const closeMenu = $("#closeMenu");
-const menuOverlay = $("#menuOverlay");
-
-const pages = $$(".page");
-const menuItems = $$(".menu-item");
-const pageTargetButtons = $$("[data-page-target]");
-
-const toast = $("#toast");
-const toastTitle = $("#toastTitle");
-const toastMessage = $("#toastMessage");
-const toastClose = $("#toastClose");
-
-const engineStatus = $("#engineStatus");
-
-
-/* =========================================================
-   APP INITIALIZATION
+   INITIALIZE
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -62,31 +40,36 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeLoader();
   initializeMenu();
   initializeNavigation();
+
   initializeRealAnalysis();
   initializeOtcAnalysis();
+
   initializeFutureSignals();
+
   initializeToast();
 
 });
 
 
 /* =========================================================
-   APP LOADER
+   LOADER
 ========================================================= */
 
 function initializeLoader() {
 
-  window.setTimeout(() => {
+  const loader = $("#appLoader");
 
-    if (!appLoader) return;
+  if (!loader) return;
 
-    appLoader.classList.add("hide");
+  setTimeout(() => {
 
-    window.setTimeout(() => {
-      appLoader.remove();
-    }, 800);
+    loader.classList.add("hide");
 
-  }, 900);
+    setTimeout(() => {
+      loader.remove();
+    }, 700);
+
+  }, 700);
 
 }
 
@@ -97,35 +80,38 @@ function initializeLoader() {
 
 function initializeMenu() {
 
+  const menuButton = $("#menuButton");
+  const sideMenu = $("#sideMenu");
+  const closeMenu = $("#closeMenu");
+  const overlay = $("#menuOverlay");
+
   if (menuButton) {
+
     menuButton.addEventListener("click", () => {
 
-      const isOpen = sideMenu.classList.contains("open");
-
-      if (isOpen) {
-        closeSideMenu();
-      } else {
-        openSideMenu();
-      }
+      sideMenu?.classList.toggle("open");
+      overlay?.classList.toggle("show");
+      menuButton.classList.toggle("active");
 
     });
+
   }
 
 
   if (closeMenu) {
-    closeMenu.addEventListener("click", closeSideMenu);
+    closeMenu.addEventListener("click", closeMenuPanel);
   }
 
 
-  if (menuOverlay) {
-    menuOverlay.addEventListener("click", closeSideMenu);
+  if (overlay) {
+    overlay.addEventListener("click", closeMenuPanel);
   }
 
 
   document.addEventListener("keydown", (event) => {
 
     if (event.key === "Escape") {
-      closeSideMenu();
+      closeMenuPanel();
     }
 
   });
@@ -133,38 +119,11 @@ function initializeMenu() {
 }
 
 
-function openSideMenu() {
+function closeMenuPanel() {
 
-  if (!sideMenu) return;
-
-  sideMenu.classList.add("open");
-
-  if (menuOverlay) {
-    menuOverlay.classList.add("show");
-  }
-
-  if (menuButton) {
-    menuButton.classList.add("active");
-    menuButton.setAttribute("aria-expanded", "true");
-  }
-
-}
-
-
-function closeSideMenu() {
-
-  if (!sideMenu) return;
-
-  sideMenu.classList.remove("open");
-
-  if (menuOverlay) {
-    menuOverlay.classList.remove("show");
-  }
-
-  if (menuButton) {
-    menuButton.classList.remove("active");
-    menuButton.setAttribute("aria-expanded", "false");
-  }
+  $("#sideMenu")?.classList.remove("open");
+  $("#menuOverlay")?.classList.remove("show");
+  $("#menuButton")?.classList.remove("active");
 
 }
 
@@ -175,71 +134,37 @@ function closeSideMenu() {
 
 function initializeNavigation() {
 
-  menuItems.forEach((item) => {
+  $$(".menu-item").forEach((item) => {
 
     item.addEventListener("click", () => {
 
-      const pageId = item.dataset.page;
+      const page = item.dataset.page;
 
-      if (!pageId) return;
+      if (!page) return;
 
-      menuItems.forEach((menuItem) => {
-        menuItem.classList.remove("active");
+      showPage(page);
+
+      $$(".menu-item").forEach((x) => {
+        x.classList.remove("active");
       });
 
       item.classList.add("active");
 
-      showPage(pageId);
-
-      closeSideMenu();
+      closeMenuPanel();
 
     });
 
   });
 
 
-  pageTargetButtons.forEach((button) => {
+  $$("[data-page-target]").forEach((button) => {
 
     button.addEventListener("click", () => {
 
-      const pageId = button.dataset.pageTarget;
+      const page = button.dataset.pageTarget;
 
-      if (!pageId) return;
-
-      showPage(pageId);
-
-      updateActiveMenu(pageId);
-
-    });
-
-  });
-
-
-  /* Dashboard cards */
-
-  $$(".dashboard-card").forEach((card) => {
-
-    card.addEventListener("click", () => {
-
-      const title = card.querySelector("h3");
-
-      if (!title) return;
-
-      const text = title.textContent.toLowerCase();
-
-      if (text.includes("real")) {
-        showPage("realAnalysisPage");
-        updateActiveMenu("realAnalysisPage");
-      }
-
-      else if (text.includes("otc")) {
-        showPage("otcAnalysisPage");
-        updateActiveMenu("otcAnalysisPage");
-      }
-
-      else if (text.includes("future")) {
-        showPage("futureSignalsPage");
-        updateActiveMenu("futureSignalsPage");
+      if (page) {
+        showPage(page);
       }
 
     });
@@ -251,26 +176,19 @@ function initializeNavigation() {
 
 function showPage(pageId) {
 
-  const targetPage = document.getElementById(pageId);
+  const page = document.getElementById(pageId);
 
-  if (!targetPage) return;
+  if (!page) return;
 
-
-  pages.forEach((page) => {
-    page.classList.remove("active-page");
+  $$(".page").forEach((p) => {
+    p.classList.remove("active-page");
   });
 
+  page.classList.remove("active-page");
 
-  /*
-    Force browser to restart page animation.
-  */
+  void page.offsetWidth;
 
-  targetPage.classList.remove("active-page");
-
-  void targetPage.offsetWidth;
-
-  targetPage.classList.add("active-page");
-
+  page.classList.add("active-page");
 
   window.scrollTo({
     top: 0,
@@ -280,39 +198,27 @@ function showPage(pageId) {
 }
 
 
-function updateActiveMenu(pageId) {
-
-  menuItems.forEach((item) => {
-
-    item.classList.toggle(
-      "active",
-      item.dataset.page === pageId
-    );
-
-  });
-
-}
-
-
 /* =========================================================
    FILE VALIDATION
 ========================================================= */
 
-function validateImageFile(file) {
+function validateImage(file) {
 
   if (!file) {
+
     return {
       valid: false,
-      message: "Please select an image."
+      message: "Please select a chart screenshot."
     };
+
   }
 
 
-  if (!APP.allowedImageTypes.includes(file.type)) {
+  if (!APP.allowedTypes.includes(file.type)) {
 
     return {
       valid: false,
-      message: "Please upload JPG, PNG or WEBP image."
+      message: "Only JPG, PNG or WEBP images are supported."
     };
 
   }
@@ -322,7 +228,7 @@ function validateImageFile(file) {
 
     return {
       valid: false,
-      message: "Image size must be below 10 MB."
+      message: "Image must be smaller than 10 MB."
     };
 
   }
@@ -336,42 +242,51 @@ function validateImageFile(file) {
 
 
 /* =========================================================
-   IMAGE PREVIEW HELPER
+   PREVIEW
 ========================================================= */
 
-function createImagePreview(
+function showPreview(
   file,
   previewBox,
   previewImage,
-  fileNameElement
+  fileName
 ) {
 
-  const validation = validateImageFile(file);
+  const check = validateImage(file);
 
-  if (!validation.valid) {
+  if (!check.valid) {
 
     showToast(
       "Invalid Image",
-      validation.message,
+      check.message,
       "error"
     );
 
     return false;
+
   }
 
 
-  const imageURL = URL.createObjectURL(file);
+  const url = URL.createObjectURL(file);
 
-  previewImage.src = imageURL;
+  if (previewImage) {
+    previewImage.src = url;
+  }
 
-  previewBox.classList.remove("hidden");
+  if (fileName) {
+    fileName.textContent = file.name;
+  }
 
-  fileNameElement.textContent = file.name;
+  previewBox?.classList.remove("hidden");
 
 
-  previewImage.onload = () => {
-    URL.revokeObjectURL(imageURL);
-  };
+  if (previewImage) {
+
+    previewImage.onload = () => {
+      URL.revokeObjectURL(url);
+    };
+
+  }
 
 
   return true;
@@ -380,12 +295,15 @@ function createImagePreview(
 
 
 /* =========================================================
-   REAL MARKET ANALYSIS
+   REAL MARKET
 ========================================================= */
 
 function initializeRealAnalysis() {
 
   const input = $("#realChartInput");
+
+  if (!input) return;
+
 
   const previewBox = $("#realPreviewBox");
   const previewImage = $("#realPreviewImage");
@@ -393,17 +311,15 @@ function initializeRealAnalysis() {
 
   const removeButton = $("#removeRealImage");
 
-  if (!input) return;
 
+  input.addEventListener("change", async () => {
 
-  input.addEventListener("change", () => {
-
-    const file = input.files[0];
+    const file = input.files?.[0];
 
     if (!file) return;
 
 
-    const success = createImagePreview(
+    const valid = showPreview(
       file,
       previewBox,
       previewImage,
@@ -411,7 +327,7 @@ function initializeRealAnalysis() {
     );
 
 
-    if (!success) {
+    if (!valid) {
 
       input.value = "";
 
@@ -420,66 +336,64 @@ function initializeRealAnalysis() {
     }
 
 
-    showToast(
-      "Chart Ready",
-      "Starting AI chart analysis...",
-      "success"
-    );
+    await analyzeChart({
 
+      mode: "real",
 
-    /*
-      Start analysis automatically
-      after image upload.
-    */
+      file,
 
-    startAnalysis({
-      type: "real",
       input,
+
       progressBox: $("#realAnalysisProgress"),
       progressFill: $("#realProgressFill"),
-      percentElement: $("#realAnalysisPercent"),
+      progressPercent: $("#realAnalysisPercent"),
       steps: $$("#realAnalysisSteps .analysis-step"),
+
       resultBox: $("#realResultBox"),
+
       signalElement: $("#realSignal"),
       signalText: $("#realSignalText"),
+
       resultTime: $("#realResultTime"),
+
       confidence: $("#realConfidence"),
       confidenceFill: $("#realConfidenceFill"),
+
       trend: $("#realTrend"),
       pattern: $("#realPattern"),
       momentum: $("#realMomentum")
+
     });
 
   });
 
 
-  if (removeButton) {
+  removeButton?.addEventListener("click", () => {
 
-    removeButton.addEventListener("click", () => {
-
-      resetAnalysis({
-        input,
-        previewBox,
-        previewImage,
-        fileName,
-        progressBox: $("#realAnalysisProgress"),
-        resultBox: $("#realResultBox")
-      });
-
+    resetAnalysis({
+      input,
+      previewBox,
+      previewImage,
+      fileName,
+      progressBox: $("#realAnalysisProgress"),
+      resultBox: $("#realResultBox")
     });
 
-  }
+  });
 
 }
 
 
 /* =========================================================
-   OTC MARKET ANALYSIS
+   OTC MARKET
 ========================================================= */
 
 function initializeOtcAnalysis() {
 
   const input = $("#otcChartInput");
+
+  if (!input) return;
+
 
   const previewBox = $("#otcPreviewBox");
   const previewImage = $("#otcPreviewImage");
@@ -487,17 +401,15 @@ function initializeOtcAnalysis() {
 
   const removeButton = $("#removeOtcImage");
 
-  if (!input) return;
 
+  input.addEventListener("change", async () => {
 
-  input.addEventListener("change", () => {
-
-    const file = input.files[0];
+    const file = input.files?.[0];
 
     if (!file) return;
 
 
-    const success = createImagePreview(
+    const valid = showPreview(
       file,
       previewBox,
       previewImage,
@@ -505,7 +417,7 @@ function initializeOtcAnalysis() {
     );
 
 
-    if (!success) {
+    if (!valid) {
 
       input.value = "";
 
@@ -514,232 +426,67 @@ function initializeOtcAnalysis() {
     }
 
 
-    showToast(
-      "OTC Chart Ready",
-      "Starting OTC analysis...",
-      "success"
-    );
+    await analyzeChart({
 
+      mode: "otc",
 
-    startAnalysis({
-      type: "otc",
+      file,
+
       input,
+
       progressBox: $("#otcAnalysisProgress"),
       progressFill: $("#otcProgressFill"),
-      percentElement: $("#otcAnalysisPercent"),
+      progressPercent: $("#otcAnalysisPercent"),
       steps: $$("#otcAnalysisSteps .analysis-step"),
+
       resultBox: $("#otcResultBox"),
+
       signalElement: $("#otcSignal"),
       signalText: $("#otcSignalText"),
+
       resultTime: $("#otcResultTime"),
+
       confidence: $("#otcConfidence"),
       confidenceFill: $("#otcConfidenceFill"),
+
       trend: $("#otcTrend"),
       pattern: $("#otcPattern"),
       momentum: $("#otcMomentum")
+
     });
 
   });
 
 
-  if (removeButton) {
+  removeButton?.addEventListener("click", () => {
 
-    removeButton.addEventListener("click", () => {
-
-      resetAnalysis({
-        input,
-        previewBox,
-        previewImage,
-        fileName,
-        progressBox: $("#otcAnalysisProgress"),
-        resultBox: $("#otcResultBox")
-      });
-
+    resetAnalysis({
+      input,
+      previewBox,
+      previewImage,
+      fileName,
+      progressBox: $("#otcAnalysisProgress"),
+      resultBox: $("#otcResultBox")
     });
-
-  }
-
-}
-
-
-/* =========================================================
-   ANALYSIS ENGINE
-========================================================= */
-
-function startAnalysis(options) {
-
-  const {
-    input,
-    progressBox,
-    progressFill,
-    percentElement,
-    steps,
-    resultBox
-  } = options;
-
-
-  if (!progressBox || !resultBox) return;
-
-
-  /*
-    Hide previous result.
-  */
-
-  resultBox.classList.add("hidden");
-
-
-  /*
-    Reset progress.
-  */
-
-  progressBox.classList.remove("hidden");
-
-  if (progressFill) {
-    progressFill.style.width = "0%";
-  }
-
-  if (percentElement) {
-    percentElement.textContent = "0%";
-  }
-
-
-  steps.forEach((step) => {
-
-    step.classList.remove("active");
-    step.classList.remove("done");
 
   });
 
-
-  /*
-    Disable input during analysis.
-  */
-
-  if (input) {
-    input.disabled = true;
-  }
-
-
-  if (engineStatus) {
-    engineStatus.textContent = "Analyzing...";
-  }
-
-
-  const startTime = performance.now();
-
-  let currentStep = -1;
-
-
-  const stepInterval =
-    APP.analysisDuration / steps.length;
-
-
-  const progressInterval = 100;
-
-
-  let elapsed = 0;
-
-
-  /*
-    Progress animation.
-  */
-
-  const progressTimer = window.setInterval(() => {
-
-    elapsed += progressInterval;
-
-    const percent = Math.min(
-      100,
-      Math.round(
-        (elapsed / APP.analysisDuration) * 100
-      )
-    );
-
-
-    if (progressFill) {
-      progressFill.style.width = `${percent}%`;
-    }
-
-
-    if (percentElement) {
-      percentElement.textContent = `${percent}%`;
-    }
-
-
-    const newStep = Math.min(
-      steps.length - 1,
-      Math.floor(
-        elapsed / stepInterval
-      )
-    );
-
-
-    if (
-      newStep !== currentStep &&
-      newStep >= 0
-    ) {
-
-      /*
-        Previous step becomes done.
-      */
-
-      if (currentStep >= 0) {
-
-        steps[currentStep]
-          .classList.remove("active");
-
-        steps[currentStep]
-          .classList.add("done");
-
-        const previousIcon =
-          steps[currentStep].querySelector("span");
-
-        if (previousIcon) {
-          previousIcon.textContent = "✓";
-        }
-
-      }
-
-
-      currentStep = newStep;
-
-      steps[currentStep]
-        .classList.add("active");
-
-      const activeIcon =
-        steps[currentStep].querySelector("span");
-
-      if (activeIcon) {
-        activeIcon.textContent = "◉";
-      }
-
-    }
-
-
-    if (elapsed >= APP.analysisDuration) {
-
-      window.clearInterval(progressTimer);
-
-      finishAnalysis(options, startTime);
-
-    }
-
-  }, progressInterval);
-
 }
 
 
 /* =========================================================
-   FINISH ANALYSIS
+   REAL ANALYSIS
 ========================================================= */
 
-function finishAnalysis(options, startTime) {
+async function analyzeChart(options) {
 
   const {
+    mode,
+    file,
     input,
     progressBox,
     progressFill,
-    percentElement,
+    progressPercent,
     steps,
     resultBox,
     signalElement,
@@ -753,102 +500,299 @@ function finishAnalysis(options, startTime) {
   } = options;
 
 
+  if (!file) return;
+
+
   /*
-    Complete progress.
+    Reset UI
   */
 
+  resultBox?.classList.add("hidden");
+
+  progressBox?.classList.remove("hidden");
+
+
   if (progressFill) {
-    progressFill.style.width = "100%";
+    progressFill.style.width = "0%";
   }
 
-  if (percentElement) {
-    percentElement.textContent = "100%";
+  if (progressPercent) {
+    progressPercent.textContent = "0%";
   }
 
 
   steps.forEach((step) => {
 
     step.classList.remove("active");
-
-    step.classList.add("done");
-
-    const icon = step.querySelector("span");
-
-    if (icon) {
-      icon.textContent = "✓";
-    }
+    step.classList.remove("done");
 
   });
 
 
+  if (input) {
+    input.disabled = true;
+  }
+
+
+  const startTime = performance.now();
+
+
   /*
-    Small delay for polished UI.
+    Animated analysis steps
   */
 
-  window.setTimeout(() => {
+  const stepMessages = [
+    "Reading chart...",
+    "Checking candles...",
+    "Checking trend...",
+    "Checking support/resistance...",
+    "Checking momentum...",
+    "Fetching market data...",
+    "Calculating indicators..."
+  ];
 
-    progressBox.classList.add("hidden");
+
+  let stepIndex = 0;
+
+
+  const stepTimer = setInterval(() => {
+
+    if (stepIndex >= steps.length) {
+
+      clearInterval(stepTimer);
+
+      return;
+
+    }
+
+
+    if (stepIndex > 0) {
+
+      steps[stepIndex - 1]
+        .classList.remove("active");
+
+      steps[stepIndex - 1]
+        .classList.add("done");
+
+      const oldIcon =
+        steps[stepIndex - 1]
+          .querySelector("span");
+
+      if (oldIcon) {
+        oldIcon.textContent = "✓";
+      }
+
+    }
+
+
+    steps[stepIndex]
+      .classList.add("active");
+
+
+    const icon =
+      steps[stepIndex]
+        .querySelector("span");
+
+    if (icon) {
+      icon.textContent = "◉";
+    }
+
+
+    if (progressPercent) {
+
+      const percent = Math.min(
+        85,
+        Math.round(
+          ((stepIndex + 1) /
+            Math.max(steps.length, 1)) * 85
+        )
+      );
+
+      progressPercent.textContent =
+        `${percent}%`;
+
+      if (progressFill) {
+        progressFill.style.width =
+          `${percent}%`;
+      }
+
+    }
+
+
+    stepIndex++;
+
+  }, 650);
+
+
+  /*
+    Send screenshot to backend.
+  */
+
+  const formData = new FormData();
+
+  formData.append("chart", file);
+  formData.append("mode", mode);
+
+
+  try {
+
+    const controller =
+      new AbortController();
+
+
+    const timeout =
+      setTimeout(() => {
+        controller.abort();
+      }, APP.analysisTimeout);
+
+
+    const response = await fetch(
+      APP.apiEndpoint,
+      {
+        method: "POST",
+        body: formData,
+        signal: controller.signal
+      }
+    );
+
+
+    clearTimeout(timeout);
+
+
+    const data =
+      await response.json();
+
+
+    clearInterval(stepTimer);
 
 
     /*
-      DEMO RESULT
-      -----------------------------------------
-      This is not a real market prediction.
-      It will later be replaced with API data.
+      Finish steps
     */
 
-    const result = generateDemoAnalysis();
+    steps.forEach((step) => {
+
+      step.classList.remove("active");
+      step.classList.add("done");
+
+      const icon =
+        step.querySelector("span");
+
+      if (icon) {
+        icon.textContent = "✓";
+      }
+
+    });
+
+
+    if (progressFill) {
+      progressFill.style.width = "100%";
+    }
+
+
+    if (progressPercent) {
+      progressPercent.textContent = "100%";
+    }
 
 
     /*
-      Signal
+      API error
     */
+
+    if (!response.ok || data.error) {
+
+      throw new Error(
+        data.error ||
+        "Analysis failed."
+      );
+
+    }
+
+
+    /*
+      IMPORTANT:
+      No random fallback.
+      If backend doesn't return a real
+      signal, we show an error instead.
+    */
+
+    if (
+      !data.signal ||
+      !["UP", "DOWN"].includes(
+        String(data.signal).toUpperCase()
+      )
+    ) {
+
+      throw new Error(
+        "The server did not return a valid market signal."
+      );
+
+    }
+
+
+    /*
+      Display actual server result
+    */
+
+    const signal =
+      String(data.signal).toUpperCase();
+
 
     applySignal(
       signalElement,
       signalText,
-      result.direction
+      signal
     );
 
 
-    /*
-      Details
-    */
-
     if (confidence) {
+
+      const value =
+        Number(data.confidence);
+
       confidence.textContent =
-        `${result.confidence}%`;
+        Number.isFinite(value)
+          ? `${Math.round(value)}%`
+          : "--";
+
     }
 
 
     if (confidenceFill) {
 
+      const value =
+        Number(data.confidence);
+
       confidenceFill.style.width =
-        `${result.confidence}%`;
+        Number.isFinite(value)
+          ? `${Math.max(
+              0,
+              Math.min(100, value)
+            )}%`
+          : "0%";
 
     }
 
 
     if (trend) {
-      trend.textContent = result.trend;
+      trend.textContent =
+        data.trend || "Unavailable";
     }
 
 
     if (pattern) {
-      pattern.textContent = result.pattern;
+      pattern.textContent =
+        data.pattern || "Unavailable";
     }
 
 
     if (momentum) {
-      momentum.textContent = result.momentum;
+      momentum.textContent =
+        data.momentum || "Unavailable";
     }
 
 
-    /*
-      Analysis duration.
-    */
-
-    const duration =
+    const seconds =
       (
         (performance.now() - startTime) /
         1000
@@ -856,128 +800,78 @@ function finishAnalysis(options, startTime) {
 
 
     if (resultTime) {
+
       resultTime.textContent =
-        `${duration}s`;
+        data.analysisTime
+          ? `${data.analysisTime}s`
+          : `${seconds}s`;
+
     }
 
 
-    /*
-      Show result.
-    */
-
-    resultBox.classList.remove("hidden");
+    resultBox?.classList.remove("hidden");
 
 
-    /*
-      Enable upload again.
-    */
+    showToast(
+      "Analysis Complete",
+      `${signal} analysis received from server.`,
+      "success"
+    );
+
+
+  }
+
+  catch (error) {
+
+    clearInterval(stepTimer);
+
+
+    resultBox?.classList.add("hidden");
+
+
+    let message =
+      error?.message ||
+      "Unable to analyze the chart.";
+
+
+    if (error?.name === "AbortError") {
+
+      message =
+        "Analysis took longer than 10 seconds.";
+
+    }
+
+
+    showToast(
+      "Analysis Failed",
+      message,
+      "error"
+    );
+
+
+    console.error(
+      "Chart analysis error:",
+      error
+    );
+
+  }
+
+
+  finally {
 
     if (input) {
       input.disabled = false;
     }
 
+    progressBox?.classList.add("hidden");
 
-    if (engineStatus) {
-      engineStatus.textContent = "Ready";
-    }
-
-
-    showToast(
-      "Analysis Complete",
-      `${result.direction} signal generated.`,
-      "success"
-    );
-
-
-  }, 350);
+  }
 
 }
 
 
 /* =========================================================
-   DEMO ANALYSIS RESULT
-========================================================= */
-
-function generateDemoAnalysis() {
-
-  const directions = [
-    "UP",
-    "DOWN"
-  ];
-
-
-  const patterns = [
-    "Breakout",
-    "Engulfing",
-    "Support Bounce",
-    "Resistance Reject",
-    "Trend Continuation",
-    "Consolidation"
-  ];
-
-
-  const trends = [
-    "Bullish",
-    "Bearish",
-    "Sideways"
-  ];
-
-
-  const momentumList = [
-    "Strong",
-    "Moderate",
-    "Weak"
-  ];
-
-
-  const direction =
-    directions[
-      Math.floor(
-        Math.random() * directions.length
-      )
-    ];
-
-
-  const confidence =
-    Math.floor(
-      72 + Math.random() * 24
-    );
-
-
-  return {
-
-    direction,
-
-    confidence,
-
-    trend:
-      trends[
-        Math.floor(
-          Math.random() * trends.length
-        )
-      ],
-
-    pattern:
-      patterns[
-        Math.floor(
-          Math.random() * patterns.length
-        )
-      ],
-
-    momentum:
-      momentumList[
-        Math.floor(
-          Math.random() * momentumList.length
-        )
-      ]
-
-  };
-
-}
-
-
-/* =========================================================
-   APPLY UP / DOWN SIGNAL
+   SIGNAL UI
 ========================================================= */
 
 function applySignal(
@@ -986,23 +880,25 @@ function applySignal(
   direction
 ) {
 
-  if (!signalElement || !signalText) {
-    return;
-  }
+  if (!signalElement) return;
 
 
   signalElement.classList.remove("down");
 
 
   const icon =
-    signalElement.querySelector(".signal-icon");
+    signalElement.querySelector(
+      ".signal-icon"
+    );
 
 
   if (direction === "DOWN") {
 
     signalElement.classList.add("down");
 
-    signalText.textContent = "DOWN";
+    if (signalText) {
+      signalText.textContent = "DOWN";
+    }
 
     if (icon) {
       icon.textContent = "↓";
@@ -1012,7 +908,9 @@ function applySignal(
 
   else {
 
-    signalText.textContent = "UP";
+    if (signalText) {
+      signalText.textContent = "UP";
+    }
 
     if (icon) {
       icon.textContent = "↑";
@@ -1022,7 +920,7 @@ function applySignal(
 
 
   /*
-    Restart animation.
+    Restart animation
   */
 
   signalElement.style.animation = "none";
@@ -1035,7 +933,7 @@ function applySignal(
 
 
 /* =========================================================
-   RESET ANALYSIS
+   RESET
 ========================================================= */
 
 function resetAnalysis(options) {
@@ -1067,24 +965,9 @@ function resetAnalysis(options) {
   }
 
 
-  if (previewBox) {
-    previewBox.classList.add("hidden");
-  }
-
-
-  if (progressBox) {
-    progressBox.classList.add("hidden");
-  }
-
-
-  if (resultBox) {
-    resultBox.classList.add("hidden");
-  }
-
-
-  if (engineStatus) {
-    engineStatus.textContent = "Ready";
-  }
+  previewBox?.classList.add("hidden");
+  progressBox?.classList.add("hidden");
+  resultBox?.classList.add("hidden");
 
 }
 
@@ -1095,24 +978,34 @@ function resetAnalysis(options) {
 
 function initializeFutureSignals() {
 
-  const marketSelect = $("#marketSelect");
-  const generateButton = $("#generateSignalsButton");
+  const marketSelect =
+    $("#marketSelect");
 
-  const loadingBox = $("#signalLoading");
-  const signalsContainer = $("#signalsContainer");
+  const button =
+    $("#generateSignalsButton");
 
-  const signalList = $("#signalList");
-  const selectedMarketName = $("#selectedMarketName");
+  const loading =
+    $("#signalLoading");
+
+  const container =
+    $("#signalsContainer");
+
+  const list =
+    $("#signalList");
+
+  const marketName =
+    $("#selectedMarketName");
 
 
-  if (!marketSelect || !generateButton) {
+  if (!marketSelect || !button) {
     return;
   }
 
 
-  generateButton.addEventListener("click", () => {
+  button.addEventListener("click", async () => {
 
-    const market = marketSelect.value;
+    const market =
+      marketSelect.value;
 
 
     if (!market) {
@@ -1123,82 +1016,120 @@ function initializeFutureSignals() {
         "error"
       );
 
-      marketSelect.focus();
-
       return;
 
     }
 
 
-    /*
-      Hide old signals.
-    */
+    button.disabled = true;
 
-    signalsContainer.classList.add("hidden");
-
-
-    /*
-      Show loading.
-    */
-
-    loadingBox.classList.remove("hidden");
-
-    generateButton.disabled = true;
-
-    generateButton.style.opacity = "0.55";
+    loading?.classList.remove("hidden");
+    container?.classList.add("hidden");
 
 
-    /*
-      Simulated generation time.
-    */
+    try {
 
-    window.setTimeout(() => {
+      /*
+        Future signals should also come
+        from backend/Twelve Data analysis.
+      */
 
-      const signals =
-        generateFutureSignals(market, 10);
+      const response = await fetch(
+        "/api/future-signals",
+        {
+          method: "POST",
 
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
 
-      if (signalList) {
-        signalList.innerHTML = "";
-      }
-
-
-      if (selectedMarketName) {
-        selectedMarketName.textContent =
-          `${market} Signals`;
-      }
-
-
-      signals.forEach(
-        (signal, index) => {
-
-          createSignalCard(
-            signal,
-            index,
-            signalList
-          );
-
+          body: JSON.stringify({
+            market,
+            count: 10
+          })
         }
       );
 
 
-      loadingBox.classList.add("hidden");
+      const data =
+        await response.json();
 
-      signalsContainer.classList.remove("hidden");
 
-      generateButton.disabled = false;
+      if (!response.ok || data.error) {
 
-      generateButton.style.opacity = "1";
+        throw new Error(
+          data.error ||
+          "Unable to generate signals."
+        );
+
+      }
+
+
+      if (!Array.isArray(data.signals)) {
+
+        throw new Error(
+          "Server returned invalid signals."
+        );
+
+      }
+
+
+      if (list) {
+        list.innerHTML = "";
+      }
+
+
+      if (marketName) {
+        marketName.textContent =
+          `${market} Signals`;
+      }
+
+
+      data.signals
+        .slice(0, 10)
+        .forEach((signal, index) => {
+
+          createSignalCard(
+            signal,
+            index,
+            list
+          );
+
+        });
+
+
+      container?.classList.remove("hidden");
 
 
       showToast(
         "Signals Ready",
-        "10 signal ideas generated.",
+        "Live analysis signals received.",
         "success"
       );
 
+    }
 
-    }, 1800);
+    catch (error) {
+
+      console.error(error);
+
+      showToast(
+        "Signal Error",
+        error.message ||
+        "Unable to generate signals.",
+        "error"
+      );
+
+    }
+
+    finally {
+
+      loading?.classList.add("hidden");
+
+      button.disabled = false;
+
+    }
 
   });
 
@@ -1206,62 +1137,7 @@ function initializeFutureSignals() {
 
 
 /* =========================================================
-   GENERATE FUTURE SIGNALS
-========================================================= */
-
-function generateFutureSignals(
-  market,
-  amount
-) {
-
-  const result = [];
-
-  const now = new Date();
-
-
-  for (let i = 0; i < amount; i++) {
-
-    const direction =
-      Math.random() > 0.5
-        ? "UP"
-        : "DOWN";
-
-
-    const confidence =
-      Math.floor(
-        70 + Math.random() * 27
-      );
-
-
-    const signalTime =
-      new Date(
-        now.getTime() +
-        ((i + 1) * 2 * 60 * 1000)
-      );
-
-
-    result.push({
-
-      market,
-
-      direction,
-
-      confidence,
-
-      time: formatTime(signalTime)
-
-    });
-
-  }
-
-
-  return result;
-
-}
-
-
-/* =========================================================
-   CREATE SIGNAL CARD
+   FUTURE SIGNAL CARD
 ========================================================= */
 
 function createSignalCard(
@@ -1285,40 +1161,62 @@ function createSignalCard(
     `${index * 80}ms`;
 
 
-  const number =
-    String(index + 1).padStart(2, "0");
+  const direction =
+    String(
+      signal.direction ||
+      signal.signal ||
+      ""
+    ).toUpperCase();
 
 
   const directionClass =
-    signal.direction === "UP"
+    direction === "UP"
       ? "up"
       : "down";
+
+
+  const directionIcon =
+    direction === "UP"
+      ? "↑ UP"
+      : "↓ DOWN";
 
 
   card.innerHTML = `
 
     <div class="signal-number">
-      ${number}
+      ${String(index + 1).padStart(2, "0")}
     </div>
 
     <div class="future-signal-market">
 
       <strong>
-        ${escapeHTML(signal.market)}
+        ${escapeHTML(
+          signal.market || ""
+        )}
       </strong>
 
       <small>
-        Confidence ${signal.confidence}%
+        Confidence ${
+          Number.isFinite(
+            Number(signal.confidence)
+          )
+            ? Math.round(
+                Number(signal.confidence)
+              ) + "%"
+            : "--"
+        }
       </small>
 
     </div>
 
     <div class="signal-time">
-      ${signal.time}
+      ${escapeHTML(
+        signal.time || "--:--"
+      )}
     </div>
 
     <div class="direction ${directionClass}">
-      ${signal.direction === "UP" ? "↑ UP" : "↓ DOWN"}
+      ${directionIcon}
     </div>
 
   `;
@@ -1330,24 +1228,7 @@ function createSignalCard(
 
 
 /* =========================================================
-   TIME FORMAT
-========================================================= */
-
-function formatTime(date) {
-
-  return date.toLocaleTimeString(
-    [],
-    {
-      hour: "2-digit",
-      minute: "2-digit"
-    }
-  );
-
-}
-
-
-/* =========================================================
-   HTML ESCAPE
+   ESCAPE HTML
 ========================================================= */
 
 function escapeHTML(value) {
@@ -1373,14 +1254,10 @@ function escapeHTML(value) {
 
 function initializeToast() {
 
-  if (toastClose) {
-
-    toastClose.addEventListener(
-      "click",
-      hideToast
-    );
-
-  }
+  $("#toastClose")?.addEventListener(
+    "click",
+    hideToast
+  );
 
 }
 
@@ -1391,48 +1268,41 @@ function showToast(
   type = "success"
 ) {
 
+  const toast = $("#toast");
+
   if (!toast) return;
 
 
-  if (toastTitle) {
-    toastTitle.textContent = title;
+  const titleElement =
+    $("#toastTitle");
+
+  const messageElement =
+    $("#toastMessage");
+
+
+  if (titleElement) {
+    titleElement.textContent = title;
   }
 
 
-  if (toastMessage) {
-    toastMessage.textContent = message;
+  if (messageElement) {
+    messageElement.textContent =
+      message;
   }
 
 
   const icon =
-    toast.querySelector(".toast-icon");
+    toast.querySelector(
+      ".toast-icon"
+    );
 
 
   if (icon) {
 
-    if (type === "error") {
-
-      icon.textContent = "×";
-
-      icon.style.color =
-        "var(--red)";
-
-      icon.style.background =
-        "rgba(255,64,92,0.08)";
-
-    }
-
-    else {
-
-      icon.textContent = "✓";
-
-      icon.style.color =
-        "var(--green)";
-
-      icon.style.background =
-        "rgba(0,230,118,0.08)";
-
-    }
+    icon.textContent =
+      type === "error"
+        ? "×"
+        : "✓";
 
   }
 
@@ -1440,13 +1310,13 @@ function showToast(
   toast.classList.add("show");
 
 
-  window.clearTimeout(
-    window.__toastTimer
+  clearTimeout(
+    window.__marketToastTimer
   );
 
 
-  window.__toastTimer =
-    window.setTimeout(
+  window.__marketToastTimer =
+    setTimeout(
       hideToast,
       3500
     );
@@ -1456,15 +1326,13 @@ function showToast(
 
 function hideToast() {
 
-  if (!toast) return;
-
-  toast.classList.remove("show");
+  $("#toast")?.classList.remove("show");
 
 }
 
 
 /* =========================================================
-   PREVENT DRAGGING IMAGES
+   IMAGE DRAG PROTECTION
 ========================================================= */
 
 document.addEventListener(
@@ -1472,8 +1340,7 @@ document.addEventListener(
   (event) => {
 
     if (
-      event.target &&
-      event.target.tagName === "IMG"
+      event.target?.tagName === "IMG"
     ) {
       event.preventDefault();
     }
@@ -1483,44 +1350,19 @@ document.addEventListener(
 
 
 /* =========================================================
-   HANDLE PAGE VISIBILITY
-========================================================= */
-
-document.addEventListener(
-  "visibilitychange",
-  () => {
-
-    if (document.hidden) {
-
-      if (engineStatus) {
-        engineStatus.textContent =
-          "Paused";
-      }
-
-    }
-
-    else {
-
-      if (engineStatus) {
-        engineStatus.textContent =
-          "Ready";
-      }
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   CONSOLE
+   STARTUP
 ========================================================= */
 
 console.log(
-  "%c AI Market Analyzer ",
+  "%c AI Market Analyzer — LIVE API MODE ",
   "background:#071321;color:#00e5ff;font-weight:bold;padding:8px;"
 );
 
 console.log(
-  "Frontend initialized successfully."
+  "Random/demo signals are disabled."
+);
+
+console.log(
+  "Chart analysis endpoint:",
+  APP.apiEndpoint
 );
