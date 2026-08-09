@@ -64,7 +64,7 @@ const CONFIG = {
 
       Example only:
 
-      apiKey: "YOUR_API_KEY"
+      apiKey: "f7569aaaff8c45b79dcc286bd1d5fec2"
 
       The key you provided should NOT be exposed
       in browser-side JavaScript.
