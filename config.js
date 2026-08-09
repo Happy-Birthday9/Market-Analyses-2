@@ -3,188 +3,34 @@
    config.js
 ========================================================= */
 
-"use strict";
-
-/*
-|--------------------------------------------------------------------------
-| API CONFIGURATION
-|--------------------------------------------------------------------------
-|
-| IMPORTANT:
-| Never put a private/secret API key in frontend JavaScript.
-| Anything inside config.js can be viewed by website visitors.
-|
-| For now, keep the key empty.
-| Later, connect your secure backend/API proxy here.
-|
-*/
-
-const CONFIG = {
-
-  APP_NAME: "AI Market Analyzer",
-
-  VERSION: "1.0.0",
-
-  /*
-  |----------------------------------------------------------
-  | Analysis Settings
-  |----------------------------------------------------------
-  */
-
-  analysis: {
-
-    maxAnalysisTime: 10000,
-
-    autoStartAfterUpload: true,
-
-    supportedImageTypes: [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/jpg"
-    ],
-
-    maxImageSizeMB: 10
-
-  },
-
-
-  /*
-  |----------------------------------------------------------
-  | AI API
-  |----------------------------------------------------------
-  */
-
-  api: {
-
-    enabled: false,
+window.MARKET_CONFIG = {
 
     /*
-      DO NOT put a private API key here.
+     * Twelve Data API Key
+     *
+     * এখানে তোমার Twelve Data API key বসাবে।
+     */
+    TWELVE_DATA_API_KEY: "f7569aaaff8c45b79dcc286bd1d5fec2",
 
-      Example only:
+    /*
+     * Twelve Data API
+     */
+    TWELVE_DATA_BASE: "https://api.twelvedata.com",
 
-      apiKey: "f7569aaaff8c45b79dcc286bd1d5fec2"
+    /*
+     * Candle timeframe
+     */
+    INTERVAL: "1min",
 
-      The key you provided should NOT be exposed
-      in browser-side JavaScript.
-    */
+    /*
+     * কতগুলো candle নেওয়া হবে
+     */
+    OUTPUT_SIZE: 80,
 
-    apiKey: "",
-
-    endpoint: "",
-
-    model: "",
-
-    timeout: 9000
-
-  },
-
-
-  /*
-  |----------------------------------------------------------
-  | Future Signals
-  |----------------------------------------------------------
-  */
-
-  futureSignals: {
-
-    count: 10,
-
-    markets: [
-
-      "EUR/USD",
-      "GBP/USD",
-      "USD/JPY",
-      "USD/CHF",
-      "AUD/USD",
-      "USD/CAD",
-      "NZD/USD",
-      "EUR/GBP",
-      "EUR/JPY",
-      "GBP/JPY",
-      "AUD/JPY",
-      "EUR/AUD",
-      "EUR/CAD",
-      "GBP/CAD",
-      "AUD/CAD",
-      "USD/SGD",
-      "USD/HKD",
-      "USD/TRY",
-      "USD/MXN",
-      "USD/ZAR"
-
-    ]
-
-  },
-
-
-  /*
-  |----------------------------------------------------------
-  | UI
-  |----------------------------------------------------------
-  */
-
-  ui: {
-
-    toastDuration: 3500,
-
-    pageAnimation: true,
-
-    signalAnimation: true,
-
-    loadingAnimation: true
-
-  }
+    /*
+     * Default market
+     * উদাহরণ: EUR/USD
+     */
+    DEFAULT_SYMBOL: "EUR/USD"
 
 };
-
-
-/*
-|--------------------------------------------------------------------------
-| Freeze Configuration
-|--------------------------------------------------------------------------
-|
-| Prevent accidental modification from other scripts.
-|
-*/
-
-Object.freeze(CONFIG);
-
-Object.freeze(CONFIG.analysis);
-Object.freeze(CONFIG.api);
-Object.freeze(CONFIG.futureSignals);
-Object.freeze(CONFIG.ui);
-
-
-/*
-|--------------------------------------------------------------------------
-| Global Access
-|--------------------------------------------------------------------------
-*/
-
-window.MARKET_ANALYZER_CONFIG = CONFIG;
-
-
-/*
-|--------------------------------------------------------------------------
-| Debug Information
-|--------------------------------------------------------------------------
-*/
-
-console.log(
-  "%c AI Market Analyzer Config Loaded ",
-  "background:#071321;color:#00e5ff;font-weight:bold;padding:7px;"
-);
-
-console.log(
-  "Version:",
-  CONFIG.VERSION
-);
-
-console.log(
-  "AI API:",
-  CONFIG.api.enabled
-    ? "Enabled"
-    : "Frontend Demo Mode"
-);
